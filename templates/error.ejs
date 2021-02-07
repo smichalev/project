@@ -1,0 +1,18 @@
+<%- include('./header', {title: 'Ошибка', mode}); %>
+<div class="d-flex justify-content-center container mt-4">
+    <div class="card w-100" style="max-width: 550px">
+        <div class="card-header d-flex justify-content-between align-items-center">
+                <img src="https://cdn-ru.bitrix24.ru/b5034771/bitrix24/806/806e2fc62805913c6827c724b0b7b7fd/logo_uSveSUA1.png"
+                     width="70"
+                     alt="">
+            <div class="font-weight-bold">Ошибка (код: <%= error.code %>)</div>
+        </div>
+        <div class="card-body" data-name="error">
+            <div class="alert alert-warning" role="alert">
+                <%= error.message %>
+            </div>
+            <a href="<%= path %>">Вернуться</a>
+        </div>
+    </div>
+</div>
+<%- include('./footer'); %>

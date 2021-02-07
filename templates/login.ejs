@@ -1,0 +1,24 @@
+<%- include('./header', {title: 'Авторизация', mode}); %>
+<div class="d-flex justify-content-center container mt-4">
+    <div class="card w-100" style="max-width: 550px">
+        <div class="card-header d-flex justify-content-between align-items-center">
+                <img src="https://cdn-ru.bitrix24.ru/b5034771/bitrix24/806/806e2fc62805913c6827c724b0b7b7fd/logo_uSveSUA1.png"
+                     width="70"
+                     alt="">
+            <div class="font-weight-bold">Авторизация</div>
+        </div>
+        <div class="card-body" data-name="authorization">
+            <div class="alert alert-danger" role="alert" style="display: none"></div>
+            <div class="mb-3">
+                <label for="loginInput" class="form-label">Ваш логин</label>
+                <input type="text" class="form-control" id="loginInput">
+            </div>
+            <div class="mb-3">
+                <label for="passwordInput" class="form-label">Ваш пароль</label>
+                <input type="password" class="form-control" id="passwordInput">
+            </div>
+            <button type="submit" class="btn btn-success w-100">Авторизация</button>
+        </div>
+    </div>
+</div>
+<%- include('./footer'); %>

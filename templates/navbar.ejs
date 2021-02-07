@@ -1,0 +1,17 @@
+<nav class="navbar navbar-light bg-light d-flex justify-content-between align-items-center" style="border-bottom: 1px solid rgba(0,0,0,.125);">
+    <a class="navbar-brand"
+       href="#"><img src="https://cdn-ru.bitrix24.ru/b5034771/bitrix24/806/806e2fc62805913c6827c724b0b7b7fd/logo_uSveSUA1.png"
+                     width="60"
+                     alt=""></a>
+    <div class="d-flex">
+        <div class="d-flex flex-column">
+            <div><%= user.login %></div>
+            <% if (user.role === 'admin') { %>
+                <div style="font-size: 12px">Администратор</div>
+            <% } else { %>
+                <div style="font-size: 12px">Пользователь</div>
+            <% } %>
+        </div>
+        <button type="button" class="btn btn-danger ml-2" id="logoutBtn">Выход</button>
+    </div>
+</nav>

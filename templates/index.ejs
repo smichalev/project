@@ -1,0 +1,122 @@
+<%- include('./header', {title: 'Главная страница', mode}); %>
+<%- include('./navbar', {user}); %>
+<% if(user.role === 'admin') { %>
+    <div class="container mt-2">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card w-100 mb-3" style="width: 18rem;">
+                    <div class="card-header">
+                        Пользователи в системе
+                    </div>
+                    <div class="card-body px-1 py-1"
+                         id="userList"
+                         data-count="<%= users.length %>"
+                         style="border-bottom: 1px solid rgba(0,0,0,.125)">
+                        <% if(users.length) { %>
+                            <% users.forEach((item, index) => { %>
+                                <div class="d-flex justify-content-between align-items-center"
+                                     data-id="<%= item._id %>"
+                                <% if(users.length < index + 1) { %> style="border-bottom: 1px solid #ccc"
+                                        <% } %>
+                                >
+                                    <div class="d-flex flex-column">
+                                        <div><%= item.login %></div>
+                                        <div style="font-size: 12px">
+                                            <% if(item.role === 'admin') { %>
+                                                Администратор
+                                            <% } else { %>
+                                                Пользователь (<%= item.cityName %>)
+                                            <% } %>
+                                        </div>
+                                    </div>
+                                    <% if(item.role !== 'admin') { %>
+                                        <div class="btn btn-danger btn-sm"
+                                             data-id="<%= item._id %>"
+                                             data-name="delete-user">Удалить
+                                        </div>
+                                    <% } %>
+                                </div>
+                            <% }); %>
+                        <% } else { %>
+                            <div class="alert alert-default">Пока нет ни одного пользователя в системе</div>
+                        <% } %>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Создать нового пользователя</h5>
+                        <div class="mb-3">
+                            <label for="loginInput" class="form-label">Имя пользователя</label>
+                            <input type="text" class="form-control" id="loginInput">
+                        </div>
+                        <div class="mb-3">
+                            <label for="passwordInput" class="form-label">Пароль пользователя</label>
+                            <input type="password" class="form-control" id="passwordInput">
+                        </div>
+                        <div class="form-group">
+                            <label for="citySelect">Выберите город</label>
+                            <% if(city.length) { %>
+                            <select class="form-control" id="citySelect" data-count="<%= city.length %>">
+                                <% } else { %>
+                                <select class="form-control" id="citySelect" data-count="<%= city.length %>" disabled>
+                                    <% } %>
+                                    <option selected>Выберите город</option>
+                                    <% if(city.length) { %>
+                                        <% city.forEach((item, index) => { %>
+                                            <option value="<%= item._id %>"><%= item.name %></option>
+                                        <% }); %>
+                                    <% } %>
+                                </select>
+                        </div>
+                        <div class="alert alert-danger" role="alert" style="display: none"></div>
+                        <% if(city.length) { %>
+                            <button class="btn btn-success w-100">Создать</button>
+                        <% } else { %>
+                            <button class="btn btn-success w-100" disabled>Создать</button>
+                        <% } %>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="card w-100 mb-3" style="width: 18rem;">
+                    <div class="card-header">
+                        Список городов
+                    </div>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item">
+                            <div class="d-flex flex-column" id="listCity" data-count="<%= city.length %>">
+                                <% if(city.length) { %>
+                                    <div class="alert alert-default" style="display: none">Пока нет ни одного города в
+                                        системе
+                                    </div>
+                                    <% city.forEach((item) => { %>
+                                        <div class="d-flex justify-content-between align-items-center mb-2"
+                                             data-id="<%= item._id %>">
+                                            <div><%= item.name %></div>
+                                            <div class="btn btn-danger btn-sm"
+                                                 data-id="<%= item._id %>"
+                                                 data-name="delete-city">Удалить
+                                            </div>
+                                        </div>
+                                    <% }); %>
+                                <% } else { %>
+                                    <div class="alert alert-default" style="display: block">Пока нет ни одного города в
+                                        системе
+                                    </div>
+                                <% } %>
+                            </div>
+                        </li>
+                    </ul>
+                    <div class="card-body">
+                        <h5 class="card-title">Добавить новый город</h5>
+                        <div class="mb-3">
+                            <label for="cityInput" class="form-label">Название города</label>
+                            <input type="text" class="form-control" id="cityInput">
+                        </div>
+                        <div class="alert alert-danger" role="alert" style="display: none"></div>
+                        <button class="btn btn-success w-100">Добавить</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+<% } %>
+<%- include('./footer'); %>
