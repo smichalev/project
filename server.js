@@ -17,8 +17,8 @@ const MODE = process.env.NODE_ENV || 'development';
 			useUnifiedTopology: true,
 		});
 		
-		app.listen(5000, () => {
-			console.log('Go to http://127.0.0.1:' + 5000);
+		app.listen(80, () => {
+			console.log('Go to http://127.0.0.1');
 		});
 	}
 	catch (e) {
