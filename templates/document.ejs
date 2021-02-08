@@ -1,0 +1,67 @@
+<%- include('./header', {title: 'Главная страница', mode}); %>
+<%- include('./navbar', {user, city}); %>
+<div class="container mt-2">
+    <div class="card w-100">
+        <div class="card-header">
+            <% if(mode === 'development') { %>
+                <a href="/">Документы по городу <%= city %></a>  / <%= document[0].PARENT_ID %>
+            <% } else { %>
+                <a href="/project">Документы по городу <%= city %></a>  / <%= document[0].PARENT_ID %>
+            <% } %>
+        </div>
+        <div class="card-body px-1 py-1">
+            <% if(!document.length) { %>
+                <div class="alert alert-warning" role="alert">
+                    Пока тут нет никаких документов
+                </div>
+            <% } else { %>
+                <table class="table table-striped px-0 py-0">
+                    <thead>
+                    <tr>
+                        <th scope="col">Название</th>
+                        <th scope="col">Создан</th>
+                        <th scope="col">Изменен</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <% document.forEach(function(item){ %>
+                        <% if(item.TYPE === 'folder') { %>
+                        <tr>
+                            <% if(mode === 'development') { %>
+                                <td><i class="fas fa-folder"></i>
+                                    <a href="/document/<%= item.PARENT_ID %>/<%= item.ID %>"><%= item.NAME %></a></td>
+                            <% } else { %>
+                                <td><i class="fas fa-folder"></i>
+                                    <a href="/project/document/<%= item.PARENT_ID %>/<%= item.ID %>"><%= item.NAME %></a>
+                                </td>
+                            <% } %>
+                            <td><%= item.CREATE_TIME %></td>
+                            <td><%= item.UPDATE_TIME %></td>
+                        </tr>
+                        <% } else { %>
+                            <tr>
+                                <% if(mode === 'development') { %>
+                                    <td data-type="file" data-id="<%= item.ID %>" style=""><i class="fas fa-file"></i>
+                                        <div class="btn btn-link px-0 py-0">
+                                            <a href="/download-document/<%=item.ID %>" target="_blank"><%= item.NAME %></a>
+                                        </div>
+                                    </td>
+                                <% } else { %>
+                                    <td data-type="file" data-id="<%= item.ID %>"><i class="fas fa-file"></i>
+                                        <div class="btn btn-link px-0 py-0">
+                                            <a href="/project/download-document/<%=item.ID %>" target="_blank"><%= item.NAME %></a>
+                                        </div>
+                                    </td>
+                                <% } %>
+                                <td><%= item.CREATE_TIME %></td>
+                                <td><%= item.UPDATE_TIME %></td>
+                            </tr>
+                            <% } %>
+                    <% }); %>
+                    </tbody>
+                </table>
+            <% } %>
+        </div>
+    </div>
+</div>
+<%- include('./footer'); %>

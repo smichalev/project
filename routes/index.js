@@ -2,8 +2,15 @@ const path = require('path');
 const md5 = require('md5');
 const ErrorList = require(path.join(__dirname, '..', 'errors', 'error.list'));
 const {User, City} = require(path.join(__dirname, '..', 'models'));
-
+const getFolderCity = require(path.join(__dirname, '..', 'lib', 'getFolderCity'));
+const axios = require('axios');
 const MODE = process.env.NODE_ENV || 'development';
+
+async function getCity(id) {
+	let result = await City.findById(id);
+	
+	return result.name;
+}
 
 module.exports = (app) => {
 	app.get(MODE === 'production' ? '/project' : '/', async (req, res, next) => {
@@ -16,12 +23,6 @@ module.exports = (app) => {
 				user: req.session.user,
 				role: req.session.user.role,
 			};
-			
-			async function getCity(id) {
-				let result = await City.findById(id);
-				
-				return result.name;
-			}
 			
 			if (req.session.user.role === 'admin') {
 				params.city = await City.find({});
@@ -49,21 +50,33 @@ module.exports = (app) => {
 				
 				params.users = users;
 				params.mode = MODE;
-				res.render('index', params);
 			}
+			else {
+				params.mode = MODE;
+				params.city = (await getCity(req.session.user.city));
+				
+				params.document = (await getFolderCity(params.city));
+			}
+			
+			res.render('index', params);
 		}
 		catch (e) {
 			next(e);
 		}
 	});
 	app.get(MODE === 'production' ? '/project/login' : '/login', (req, res, next) => {
-		if (req.session.user) {
-			return res.redirect(MODE === 'production' ? '/project' : '/');
+		try {
+			if (req.session.user) {
+				return res.redirect(MODE === 'production' ? '/project' : '/');
+			}
+			
+			res.render('login', {
+				mode: MODE,
+			});
 		}
-		
-		res.render('login', {
-			mode: MODE,
-		});
+		catch (e) {
+			next(e);
+		}
 	});
 	app.post(MODE === 'production' ? '/project/login' : '/login', async (req, res, next) => {
 		try {
@@ -214,6 +227,107 @@ module.exports = (app) => {
 			next(e);
 		}
 	});
+	app.post(MODE === 'production' ? '/project/delete-user' : '/delete-user', async (req, res, next) => {
+		try {
+			if (!req.session.user || req.session.user.role !== 'admin') {
+				throw new ErrorList(ErrorList.CODES.NO_RIGHTS_TO_ACT);
+			}
+			
+			if (!req.body._id) {
+				throw new ErrorList(ErrorList.CODES.NOT_CORRECT_QUERY);
+			}
+			
+			let findUser = await User.findById(req.body._id);
+			
+			if (!findUser) {
+				throw new ErrorList(ErrorList.CODES.NOT_FOUND);
+			}
+			
+			await User.findOneAndRemove({_id: req.body._id});
+			
+			res.json({
+				result: findUser,
+			});
+		}
+		catch (e) {
+			next(e);
+		}
+	});
+	
+	app.get(MODE === 'production' ? '/project/document' : '/document', async (req, res, next) => {
+		try {
+			res.redirect(MODE === 'production' ? '/project' : '/');
+		}
+		catch (e) {
+			next(e);
+		}
+	});
+	
+	app.get(MODE === 'production' ? '/project/download-document/:id' : '/download-document/:id', async (req, res, next) => {
+		try {
+			if (!req.session.user || req.session.user.role !== 'user') {
+				throw new ErrorList(ErrorList.CODES.NO_RIGHTS_TO_ACT);
+			}
+			
+			if (!req.params.id) {
+				throw new ErrorList(ErrorList.CODES.NOT_CORRECT_QUERY);
+			}
+			
+			let result = await axios.post('https://atcgaz.bitrix24.ru/rest/10028/eko8226nd4no73ff/disk.file.getexternallink.json?id=' + req.params.id);
+			
+			console.log(result.data.result);
+			
+			if (!result || !result.data || !result.data.result) {
+				throw new ErrorList(ErrorList.CODES.NOT_FOUND);
+			}
+			
+			res.redirect(result.data.result);
+		}
+		catch (e) {
+			next(e);
+		}
+	});
+	
+	app.get(MODE === 'production' ? '/project/document/:id' : '/document/:id', async (req, res, next) => {
+		try {
+			if (!req.session.user || req.session.user.role !== 'user') {
+				throw new ErrorList(ErrorList.CODES.NO_RIGHTS_TO_ACT);
+			}
+			
+			if (!req.params.id) {
+				throw new ErrorList(ErrorList.CODES.NOT_CORRECT_QUERY);
+			}
+			
+			let result;
+			
+			try {
+				result = await axios.post('https://atcgaz.bitrix24.ru/rest/10028/v3ywifvkfhtwi2jn/disk.folder.getchildren.json?id=' + req.params.id);
+			}
+			catch (e) {
+				next(e);
+			}
+			
+			if (!result || !result.data || !result.data.result || result.data.result.length === 0) {
+				throw new ErrorList(ErrorList.CODES.NOT_FOUND);
+			}
+			
+			let city = await getCity(req.session.user.city);
+			
+			let params = {
+				document: result.data.result,
+				mode: MODE,
+				user: req.session.user,
+				role: req.session.user.role,
+				city,
+			};
+			
+			res.render('document', params);
+		}
+		catch (e) {
+			next(e);
+		}
+	});
+	
 	app.use((err, req, res, next) => {
 		if (!err) {
 			return next();
@@ -225,7 +339,6 @@ module.exports = (app) => {
 			message: err.message,
 		});
 	});
-	
 	app.use((req, res) => {
 		return res.render('error', {
 			error: {message: 'Ничего не найдено', code: 404}, path: MODE === 'production' ? '/project' : '/',

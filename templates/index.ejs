@@ -119,4 +119,44 @@
         </div>
     </div>
 <% } %>
+
+<% if(user.role === 'user') { %>
+    <div class="container mt-2">
+        <div class="card w-100">
+            <div class="card-header">
+                Документы по городу <%= city %>
+            </div>
+            <div class="card-body px-1 py-1">
+                <% if(!document.length) { %>
+                    <div class="alert alert-warning" role="alert">
+                        Пока тут нет никаких документов
+                    </div>
+                <% } else { %>
+                    <table class="table table-striped px-0 py-0">
+                        <thead>
+                        <tr>
+                            <th scope="col">Название</th>
+                            <th scope="col">Создан</th>
+                            <th scope="col">Изменен</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <% document.forEach(function(item){ %>
+                            <tr>
+                                <% if(mode === 'development') { %>
+                                <td><i class="fas fa-folder"></i> <a href="/document/<%= item.id %>"><%= item.value %></a></td>
+                                <% } else { %>
+                                <td><i class="fas fa-folder"></i> <a href="/project/document/<%= item.id %>"><%= item.value %></a></td>
+                                <% } %>
+                                <td><%= item.created %></td>
+                                <td><%= item.update %></td>
+                            </tr>
+                        <% }); %>
+                        </tbody>
+                    </table>
+                <% } %>
+            </div>
+        </div>
+    </div>
+<% } %>
 <%- include('./footer'); %>

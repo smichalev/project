@@ -132,12 +132,41 @@ $(function () {
 			$.post(MODE === 'development' ? "/new-user" : "/project/new-user", params)
 				.then((data) => {
 					$('#userList').attr('data-count', +($('#userList').attr('data-count')) + 1);
+					
+					if (+($('#userList').attr('data-count')) === 1) {
+						$('#userList div.alert').remove();
+					}
+					
 					$('#userList')
-						.append('<div class="d-flex justify-content-between align-items-center" data-id="' + data.result._id + '"><div class="d-flex flex-column"><div>' + data.result.login + '</div><div style="font-size: 12px">Пользователь</div></div><div class="btn btn-danger btn-sm"  data-id="' + data.result._id + '" data-name="delete-user">Удалить</div></div>');
+						.append('<div class="d-flex justify-content-between align-items-center" data-id="' + data.result._id + '"><div class="d-flex flex-column"><div>' + data.result.login + '</div><div style="font-size: 12px">Пользователь (' + $(
+							'option[value="' + $('#citySelect').val() + '"]')
+							.text() + ')</div></div><div class="btn btn-danger btn-sm"  data-id="' + data.result._id + '" data-name="delete-user">Удалить</div></div>');
+					
+					deleteUser();
 				})
 				.catch((err) => {
 					$('#loginInput').parent().parent().find('div.alert').show();
 					$('#loginInput').parent().parent().find('div.alert').text(err.responseJSON.message);
+				});
+		});
+	}
+	
+	function deleteUser() {
+		$('div[data-name="delete-user"]').on('click', (e) => {
+			let params = {};
+			
+			if ($(e.target).attr('data-id')) {
+				params._id = $(e.target).attr('data-id');
+			}
+			
+			$.post(MODE === 'development' ? "/delete-user" : "/project/delete-user", params)
+				.then((data) => {
+					$('#userList').attr('data-count', +($('#userList').attr('data-count')) - 1);
+					$('#userList div[data-id="' + data.result._id + '"]').remove();
+					
+					if (+($('#userList').attr('data-count')) === 0) {
+						$('#userList').append('<div class="alert alert-default">Пока нет ни одного пользователя в системе</div>');
+					}
 				});
 		});
 	}
@@ -147,4 +176,5 @@ $(function () {
 	addNewCity();
 	deleteCity();
 	newUser();
+	deleteUser();
 });

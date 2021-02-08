@@ -9,7 +9,7 @@
             <% if (user.role === 'admin') { %>
                 <div style="font-size: 12px">Администратор</div>
             <% } else { %>
-                <div style="font-size: 12px">Пользователь</div>
+                <div style="font-size: 12px">Пользователь (<%= city %>)</div>
             <% } %>
         </div>
         <button type="button" class="btn btn-danger ml-2" id="logoutBtn">Выход</button>
